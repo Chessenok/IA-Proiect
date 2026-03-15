@@ -1,97 +1,88 @@
 import sys
-import time
 
-import numpy as np
-import io_utils as io
-def _backtracking(matrice, n, oras_curent, vizitat, traseu, cost):
-    """Explorare recursiva a spatiului de solutii TSP prin backtracking.
+def _backtracking(matrice, n, oras_curent, vizitat, traseu_curent, cost_curent, cea_mai_buna_solutie):
+    """
+    Explorare recursivă a spațiului de soluții TSP prin backtracking.
 
-    La fiecare apel recursiv se incearca extinderea traseului curent cu un
-    oras nevizitat. Ramurile al caror cost partial depaseste minimul global
-    cunoscut sunt abandonate imediat (prunere branch-and-bound).
+    Funcție internă care implementează logica de generare a traseelor și prunere
+    (branch-and-bound). Utilizează un dicționar mutabil pentru a reține
+    costul minim și traseul optim la nivel global.
 
     Args:
-        matrice: Matricea de distante NxN (lista de liste de intregi).
-        n: Numarul de orase (int).
-        oras_curent: Indexul orasului in care ne aflam la pasul curent (int).
-        vizitat: Lista de booleeni de lungime n; vizitat[i] este True daca
-            orasul i a fost deja inclus in traseu.
-        traseu: Lista cu orasele vizitate pana acum, in ordinea parcurgerii.
-            Primul element este intotdeauna 0 (orasul de start).
-        cost: Costul acumulat al traseului partial curent (int sau float).
+        matrice (list of list of int): Matricea de distanțe NxN.
+        n (int): Numărul total de orașe.
+        oras_curent (int): Indexul orașului vizitat la pasul curent.
+        vizitat (list of bool): Starea de vizitare a fiecărui oraș.
+        traseu_curent (list of int): Orașele vizitate până în prezent.
+        cost_curent (int): Costul acumulat al traseului parțial curent.
+        cea_mai_buna_solutie (dict): Un dicționar mutabil cu cheile 'traseu' 
+            (list of int) și 'cost' (int), care stochează minimul global curent.
     """
-    global _cost_minim, _traseu_optim
-
-    # Caz de baza: toate orasele au fost vizitate — inchidem turul.
-    if len(traseu) == n:
-        cost_total = cost + matrice[oras_curent][traseu[0]]
-        if cost_total < _cost_minim:
-            _cost_minim = cost_total
-            _traseu_optim = traseu[:]  # copie a listei curente
+    if len(traseu_curent) == n:
+        cost_total = cost_curent + matrice[oras_curent][traseu_curent[0]]
+        
+        if cost_total < cea_mai_buna_solutie['cost']:
+            cea_mai_buna_solutie['cost'] = cost_total
+            cea_mai_buna_solutie['traseu'] = traseu_curent[:]
         return
 
-    # Pas recursiv: incercam extinderea traseului cu fiecare oras nevizitat.
     for urmator in range(n):
-        if vizitat[urmator]:
-            continue
+        if not vizitat[urmator]:
+            cost_nou = cost_curent + matrice[oras_curent][urmator]
 
-        cost_nou = cost + matrice[oras_curent][urmator]
+            if cost_nou < cea_mai_buna_solutie['cost']:
+                vizitat[urmator] = True
+                traseu_curent.append(urmator)
 
-        # Prunere: abandonam ramura daca costul partial nu poate imbunatati
-        # solutia optima cunoscuta (toate distantele sunt strict pozitive).
-        if cost_nou >= _cost_minim:
-            continue
+                _backtracking(
+                    matrice, n, urmator, vizitat, traseu_curent, 
+                    cost_nou, cea_mai_buna_solutie
+                )
 
-        vizitat[urmator] = True
-        traseu.append(urmator)
-
-        _backtracking(matrice, n, urmator, vizitat, traseu, cost_nou)
-
-        # Revenire (backtrack): restauram starea pentru a explora alte ramuri.
-        traseu.pop()
-        vizitat[urmator] = False
+                traseu_curent.pop()
+                vizitat[urmator] = False
 
 
-def rezolva_tsp(cale_fisier):
-    """Rezolva TSP prin backtracking recursiv cu prunere branch-and-bound.
+def rezolva_tsp(matrice):
+    """
+    Rezolvă Problema Comis-Voiajorului (TSP) folosind backtracking optimizat.
 
-    Citeste datele din fisierul specificat, ruleaza algoritmul de backtracking
-    si afiseaza traseul optim, costul minim si timpul de executie.
+    Primește direct matricea de distanțe și inițializează căutarea drumului 
+    de cost minim care trece prin toate orașele exact o dată și se întoarce 
+    la punctul de plecare.
 
     Args:
-        cale_fisier: Calea catre fisierul text cu matricea de distante (str).
+        matrice (list of list of int): Matricea de distanțe NxN.
+
+    Returns:
+        tuple: Un tuplu conținând:
+            - traseu_optim (list of int): Lista cu indicii orașelor în ordinea
+              optimă de parcurgere.
+            - cost_minim (int): Costul total al traseului optim. 
+            (Returnează ([], 0) dacă nu există soluție sau matricea e prea mică).
     """
-    global _cost_minim, _traseu_optim
+    n = len(matrice)
+    
+    if n <= 1:
+        return ([0] if n == 1 else [], 0)
 
-    matrice = io.citesteMatriceInt(cale_fisier)
-    n =  len(matrice)
-    print(f"Numar de orase: {n}")
-    print("Matricea de distante:")
-    for rand in matrice:
-        print("  " + "  ".join(f"{val:2d}" for val in rand))
-    print()
+    cea_mai_buna_solutie = {
+        'traseu': [],
+        'cost': sys.maxsize
+    }
 
-    # Resetam variabilele globale pentru a permite apeluri repetate.
-    _cost_minim = sys.maxsize
-    _traseu_optim = []
-
-    # Fixam orasul de start la indexul 0 (optimizare pentru TSP simetric:
-    # elimina N rotatii echivalente ale aceluiasi tur).
     vizitat = [False] * n
     vizitat[0] = True
+    traseu_initial = [0]
 
-    start = time.perf_counter()
-    _backtracking(matrice, n, 0, vizitat, [0], 0)
-    durata = time.perf_counter() - start
+    _backtracking(
+        matrice=matrice,
+        n=n,
+        oras_curent=0,
+        vizitat=vizitat,
+        traseu_curent=traseu_initial,
+        cost_curent=0,
+        cea_mai_buna_solutie=cea_mai_buna_solutie
+    )
 
-    if _traseu_optim:
-        sir_traseu = " -> ".join(map(str, _traseu_optim))
-        sir_traseu += f" -> {_traseu_optim[0]}"
-        print(f"Traseu optim:   {sir_traseu}")
-        print(f"Cost minim:     {_cost_minim}")
-    else:
-        print("Nu a fost gasit niciun traseu valid.")
-
-    print(f"Timp de executie: {durata:.6f} secunde")
-
-
+    return cea_mai_buna_solutie['traseu'], cea_mai_buna_solutie['cost']

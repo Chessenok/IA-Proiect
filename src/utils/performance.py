@@ -1,12 +1,11 @@
-import os
 import random
 import time
 import multiprocessing
 import matplotlib.pyplot as plt
 
 # Importăm modulele tale
-import backtracking
-import hill_climbing_tsp as hctsp
+import utils.backtracking as backtracking
+import utils.hill_climbing_tsp as hctsp
 
 def genereaza_matrice_simetrica(n, seed=42):
     """Generează o matrice de distanțe simetrică cu valori între 1 și 100."""
@@ -19,25 +18,16 @@ def genereaza_matrice_simetrica(n, seed=42):
             matrice[j][i] = valoare
     return matrice
 
-def salveaza_matrice_temp(matrice, fisier_temp="temp_matrix.txt"):
-    """Salvează matricea pe disc pentru a putea fi citită de backtracking."""
-    with open(fisier_temp, "w") as f:
-        for rand in matrice:
-            f.write(" ".join(map(str, rand)) + "\n")
+def wrapper_backtracking(matrice):
+    """O funcție simplă care apelează backtracking-ul (folosită pentru timeout)."""
+    # Deoarece am refactorizat backtracking.py să nu mai aibă print-uri,
+    # apelul este acum curat și nu mai necesită devierea stdout-ului.
+    backtracking.rezolva_tsp(matrice)
 
-def wrapper_backtracking(fisier):
-    """O funcție simplă care doar apelează backtracking-ul colegului."""
-    # Am ascuns print-urile interne ale backtracking-ului pentru a nu polua terminalul
-    # Dacă vrei să vezi printurile colegului, poți scoate redirectionarea
-    import sys
-    sys.stdout = open(os.devnull, 'w')
-    backtracking.rezolva_tsp(fisier)
-    sys.stdout.close()
-
-def ruleaza_bt_cu_timeout(fisier, timeout=30):
+def ruleaza_bt_cu_timeout(matrice, timeout=30):
     """Rulează backtracking-ul într-un proces separat, forțând oprirea la timeout."""
     start = time.perf_counter()
-    p = multiprocessing.Process(target=wrapper_backtracking, args=(fisier,))
+    p = multiprocessing.Process(target=wrapper_backtracking, args=(matrice,))
     p.start()
     p.join(timeout)
     
@@ -45,7 +35,7 @@ def ruleaza_bt_cu_timeout(fisier, timeout=30):
         # A depășit limita de timp!
         p.terminate()
         p.join()
-        return None # Returnăm None pentru a semnala timeout-ul
+        return None
         
     durata = time.perf_counter() - start
     return durata
@@ -58,7 +48,6 @@ def ruleaza_experiment():
     timpi_bt = []
     timpi_hc = []
     
-    fisier_temp = "temp_tsp_experiment.txt"
     seed_fix = 42
 
     print("=== START EXPERIMENT PERFORMANTA ===")
@@ -67,10 +56,9 @@ def ruleaza_experiment():
     print("\n1. Testare Backtracking (limita 30 secunde)...")
     for n in valori_n_bt:
         matrice = genereaza_matrice_simetrica(n, seed=seed_fix)
-        salveaza_matrice_temp(matrice, fisier_temp)
         
         print(f"  -> Rulare BT pentru N={n}...", end="", flush=True)
-        timp = ruleaza_bt_cu_timeout(fisier_temp, timeout=30)
+        timp = ruleaza_bt_cu_timeout(matrice, timeout=30)
         
         if timp is None:
             print(" TIMEOUT! (>30 secunde)")
@@ -83,19 +71,17 @@ def ruleaza_experiment():
     print("\n2. Testare Hill Climbing...")
     for n in valori_n_hc:
         matrice = genereaza_matrice_simetrica(n, seed=seed_fix)
-        # Nu mai salvam pe disc, ii pasam direct matricea (conform discutiei anterioare)
         
         print(f"  -> Rulare HC pentru N={n}...", end="", flush=True)
         start_hc = time.perf_counter()
-        # Apelam HC (il ignoram pe traseu_optim si cost_minim, ne intereseaza doar timpul)
+        
+        # Apelam HC (acum și el ar trebui să primească matricea direct, 
+        # conform ultimei noastre modificări din Opțiunea 1)
         _, _ = hctsp.rezolva_tsp_hc(matrice)
+        
         timp = time.perf_counter() - start_hc
         print(f" {timp:.4f} secunde.")
         timpi_hc.append(timp)
-
-    # Curățăm fișierul temporar
-    if os.path.exists(fisier_temp):
-        os.remove(fisier_temp)
 
     print("\nExperiment finalizat! Generare grafice...")
     genereaza_grafice(valori_n_bt, timpi_bt, valori_n_hc, timpi_hc)
@@ -103,8 +89,7 @@ def ruleaza_experiment():
 
 def genereaza_grafice(n_bt, timpi_bt, n_hc, timpi_hc):
     """Desenează cele două subploturi cerute."""
-    # Curățăm lista de timpi Backtracking de valorile None (dacă au luat timeout)
-    # ca să putem trasa graficul corect
+    # Filtrăm timeout-urile (None) pentru plotarea graficului
     n_bt_valid = [n for n, t in zip(n_bt, timpi_bt) if t is not None]
     timpi_bt_valid = [t for t in timpi_bt if t is not None]
 
@@ -129,12 +114,10 @@ def genereaza_grafice(n_bt, timpi_bt, n_hc, timpi_hc):
     ax2.legend()
     ax2.grid(True, linestyle='--', alpha=0.7)
 
-    # Salvare și afișare
     nume_fisier = 'comparare_performanta.png'
     plt.tight_layout()
     plt.savefig(nume_fisier)
     print(f"Graficul a fost salvat cu succes ca '{nume_fisier}' în folderul curent.")
-    # plt.show() # Poti decomenta asta daca vrei sa iti si apara fereastra pe ecran
 
 if __name__ == '__main__':
     ruleaza_experiment()
