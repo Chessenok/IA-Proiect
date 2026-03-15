@@ -17,7 +17,7 @@ def afiseaza_rezultat(nume_algoritm, traseu, cost, durata):
 
 def main():
     # 1. Ajustează calea către fișierul tău de test aici
-    cale_fisier = "../Test Files/orase7.txt" 
+    cale_fisier = "Test Files/orase7.txt" 
     
     print("=" * 50)
     print(" PARTEA 1: REZOLVARE INSTANȚĂ DE TEST")
