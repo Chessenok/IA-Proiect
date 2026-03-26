@@ -1,12 +1,3 @@
-<<<<<<< Updated upstream
-import sys
-from src.utils import manhattan
-
-
-def main():
-    print(f'automat(scipy) - {manhattan.calculateAutomaticallyFromFile()}')
-    print(f'manual - {manhattan.calculateFromFile()}')
-=======
 import argparse
 import sys
 from utils import io_utils
@@ -72,7 +63,6 @@ def main():
     print(f" - Timp real: {stats['timp_executie']:.4f} secunde")
     print(f" - Soluții explorate: {stats['solutii_gasite']}")
 
->>>>>>> Stashed changes
 
 if __name__ == "__main__":
     sys.exit(main())
