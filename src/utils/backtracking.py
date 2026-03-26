@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import sys
 import time
 
@@ -95,3 +96,90 @@ def rezolva_tsp(cale_fisier):
     print(f"Timp de executie: {durata:.6f} secunde")
 
 
+=======
+import time
+
+
+def rezolva_tsp_backtracking(n, matrice, mod='toate', timp_max=None, y_max=None):
+    """
+    Implementează algoritmul Backtracking pentru TSP cu 4 moduri de oprire.
+
+    Returnează: (best_path, min_cost, stats)
+    """
+    start_time = time.time()
+
+    # Variabile de stare pentru algoritm
+    best_path = []
+    min_cost = float('inf')
+    solutii_gasite = 0
+    stop_flag = False
+
+    # Calea curentă începe mereu din orașul 0 pentru a evita permutările circulare
+    path_curent = [0]
+    vizitat = [False] * n
+    vizitat[0] = True
+
+    def backtrack(u, cost_curent):
+        nonlocal min_cost, best_path, solutii_gasite, stop_flag
+
+        # Verificare limită de timp (modul 'timp')
+        if mod == 'timp' and (time.time() - start_time) > timp_max:
+            stop_flag = True
+            return
+
+        # Condiție de oprire dacă am găsit deja destule soluții (modul 'y_solutii')
+        if mod == 'y_solutii' and solutii_gasite >= y_max:
+            stop_flag = True
+            return
+
+        # Pruning: dacă deja am depășit costul minim, nu are sens să continuăm pe ramura asta
+        # (Nu se aplică la modul 'prima' pentru că acolo vrem doar prima soluție validă)
+        if mod != 'prima' and cost_curent >= min_cost:
+            return
+
+        # Am vizitat toate orașele?
+        if len(path_curent) == n:
+            # Verificăm dacă există drum înapoi la start
+            distanta_retur = matrice[u][0]
+            if distanta_retur > 0:  # Presupunem 0 sau -1 pentru lipsă muchie
+                total_cost = cost_curent + distanta_retur
+                solutii_gasite += 1
+
+                # Actualizăm cea mai bună soluție
+                if total_cost < min_cost:
+                    min_cost = total_cost
+                    best_path = list(path_curent) + [0]
+
+                # Modul 'prima' - ne oprim imediat după prima soluție completă
+                if mod == 'prima':
+                    stop_flag = True
+
+            return
+
+        # Explorăm vecinii
+        for v in range(n):
+            if not vizitat[v] and matrice[u][v] > 0:
+                vizitat[v] = True
+                path_curent.append(v)
+
+                backtrack(v, cost_curent + matrice[u][v])
+
+                # Backtrack (curățare)
+                path_curent.pop()
+                vizitat[v] = False
+
+                if stop_flag:
+                    return
+
+    # Lansăm algoritmul
+    backtrack(0, 0)
+
+    # Colectăm metrice de performanță
+    stats = {
+        "timp_executie": time.time() - start_time,
+        "solutii_gasite": solutii_gasite,
+        "mod_utilizat": mod
+    }
+
+    return best_path, min_cost, stats
+>>>>>>> Stashed changes
