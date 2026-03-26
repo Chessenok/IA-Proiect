@@ -1,4 +1,4 @@
-<<<<<<< Updated upstream
+
 import sys
 import time
 
@@ -96,7 +96,6 @@ def rezolva_tsp(cale_fisier):
     print(f"Timp de executie: {durata:.6f} secunde")
 
 
-=======
 import time
 
 
@@ -182,4 +181,3 @@ def rezolva_tsp_backtracking(n, matrice, mod='toate', timp_max=None, y_max=None)
     }
 
     return best_path, min_cost, stats
->>>>>>> Stashed changes
