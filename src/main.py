@@ -1,7 +1,7 @@
 import argparse
 import sys
-from utils import io_utils
-from utils import backtracking
+from utils.io_utils import genereaza_matrice_aleatorie,citeste_matrice
+from utils.backtracking import rezolva_tsp_backtracking
 
 
 def main():
