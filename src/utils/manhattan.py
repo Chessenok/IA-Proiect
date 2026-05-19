@@ -1,35 +1,18 @@
-from scipy.spatial import distance
+def manhattan(v1: list[int], v2: list[int]) -> int:
+    """
+    Compute the Manhattan distance between two integer vectors.
 
+    Args:
+        v1 (list[int]): The first vector.
+        v2 (list[int]): The second vector.
 
+    Raises:
+        ValueError: If the two vectors do not have the same length.
 
-'''
-Manhattan distance between two vectors, x and y, where x and y have the same length.
-'''
-def calculateFromFile(filename = "in.txt"):
-    x = []
-    y = []
-    with open(filename, "r") as f:
-        line = f.readline().removesuffix('\n').split(" ")
-        for i in range(0, len(line)):
-            x.append(int(line[i]))
-        line = f.readline().split(" ")
-        for i in range(0, len(line)):
-            y.append(int(line[i]))
-    sum = 0;
-    for i in range(0, len(x)):
-        sum += abs(x[i] - y[i])
+    Returns:
+        int: The Manhattan distance between v1 and v2.
+    """
+    if len(v1) != len(v2):
+        raise ValueError("The 2 vectors must be the same size!")
 
-    return sum
-
-def calculateAutomaticallyFromFile(filename = "in.txt"):
-    x = []
-    y = []
-    with open(filename, "r") as f:
-        line = f.readline().removesuffix('\n').split(" ")
-        for i in range(0, len(line)):
-            x.append(int(line[i]))
-        line = f.readline().split(" ")
-        for i in range(0, len(line)):
-            y.append(int(line[i]))
-    sum = distance.cityblock(x,y)
-    return sum
+    return sum(abs(x - y) for x, y in zip(v1, v2))
