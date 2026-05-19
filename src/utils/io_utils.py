@@ -1,26 +1,23 @@
-import numpy
+def citeste_matrice(cale_fisier: str) -> list[list[int]]:
+    """
+    Reads a distance matrix from a text file.
 
+    Format:
+        First line: n (number of cities)
+        Next n lines: n integers per line
 
-'''Reads a matrix in clear format(no other lines), and returns a numpy array, floats'''
-def citesteMatriceNumpyFloat(cale):
-    with open(cale, "r") as f:
-        lines = f.readlines()
-        a = numpy.zeros((len(lines), len(lines[0].strip().split())))
-        for i in range(len(lines)):
-            for j in range(len(lines[i].strip().split())):
-                a[i, j] = float(lines[i].strip().split()[j])
+    Args:
+        cale_fisier (str): Path to input file.
 
-        return a
+    Returns:
+        list[list[int]]: Distance matrix.
+    """
 
-'''Reads a matrix in clear format, returns a simple python matrix, integers'''
-def citesteMatriceInt(cale):
-    with open(cale, "r") as f:
-        lines = f.readlines()
-        a = []
-        for i in range(len(lines)):
-            row = []
-            for j in range(len(lines[i].strip().split())):
-                row.append(int(lines[i].strip().split()[j]))
-            a.append(row)
-        return a
+    with open(cale_fisier, "r") as f:
+        lines = [l.strip() for l in f if l.strip()]
 
+    n = int(lines[0])
+    return [
+        [int(x) for x in lines[i + 1].split()]
+        for i in range(n)
+    ]
