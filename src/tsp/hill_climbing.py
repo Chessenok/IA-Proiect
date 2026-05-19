@@ -3,6 +3,7 @@ from simpleai.search import (
     hill_climbing_random_restarts
 )
 
+import random
 
 class TSPHillClimbing(SearchProblem):
     """
@@ -83,6 +84,14 @@ class TSPHillClimbing(SearchProblem):
         cost += self.matrice[state[-1]][state[0]]
 
         return -cost
+    
+    def generate_random_state(self):
+        """
+        Generază o rută aleatorie pentru restarturile algoritmului.
+        """
+        state = list(range(self.n))
+        random.shuffle(state)
+        return state
 
 def rezolva_tsp_hc(n: int, matrice: list[list[int]], reporniri: int = 10):
     """
