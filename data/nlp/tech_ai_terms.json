@@ -1,0 +1,70 @@
+{
+  "name": "tech_ai_terms",
+  "description": "Termeni pentru software, AI, ML si infrastructura digitala",
+  "categories": {
+    "inteligenta_artificiala": [
+      "inteligenta",
+      "inteligență",
+      "artificiala",
+      "artificială",
+      "ai",
+      "machine",
+      "learning",
+      "model",
+      "antrenare",
+      "predictie",
+      "predicție",
+      "clasificare",
+      "nlp",
+      "vectorizare",
+      "tfidf",
+      "algoritm",
+      "neuronal",
+      "generativ"
+    ],
+    "software": [
+      "aplicatie",
+      "aplicație",
+      "software",
+      "sistem",
+      "interfata",
+      "interfață",
+      "update",
+      "patch",
+      "server",
+      "cloud",
+      "baza",
+      "date",
+      "api",
+      "platforma",
+      "platformă",
+      "automatizare"
+    ],
+    "securitate": [
+      "securitate",
+      "criptare",
+      "autentificare",
+      "vulnerabilitate",
+      "firewall",
+      "atac",
+      "malware",
+      "protectie",
+      "protecție",
+      "certificat",
+      "token"
+    ],
+    "hardware": [
+      "procesor",
+      "memorie",
+      "senzor",
+      "camera",
+      "cameră",
+      "baterie",
+      "dispozitiv",
+      "robot",
+      "gps",
+      "lidar",
+      "radar"
+    ]
+  }
+}

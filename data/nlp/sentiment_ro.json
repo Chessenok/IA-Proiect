@@ -1,0 +1,20 @@
+{
+  "name": "sentiment_ro",
+  "description": "Lexicon de sentiment (română) — cuvinte pozitive și negative",
+  "positive": [
+    "bun", "buna", "bune", "excelent", "excelenta", "minunat", "minunata",
+    "rapid", "rapida", "eficient", "eficienta", "reușit", "reusit", "succes",
+    "optim", "optima", "perfect", "perfecta", "sigur", "sigura", "stabil",
+    "usor", "ușor", "simplu", "clar", "precis", "precisa", "profitabil",
+    "econom", "economic", "satisfacator", "fericit", "fericita", "placut",
+    "placuta", "recomand", "imbunatatit", "îmbunătățit", "superior"
+  ],
+  "negative": [
+    "rau", "rea", "rele", "prost", "proasta", "lent", "lenta", "defect",
+    "defecta", "esuat", "eșuat", "picat", "pica", "pierdut", "pierdere",
+    "intarziere", "întârziere", "scump", "scumpa", "riscant", "instabil",
+    "greu", "grea", "complicat", "neclar", "eroare", "problema", "problemă",
+    "avarie", "blocat", "blocata", "anulat", "anulata", "dezamagit",
+    "dezamăgit", "inferior", "periculos", "periculoasa", "imposibil"
+  ]
+}

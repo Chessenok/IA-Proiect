@@ -1,0 +1,33 @@
+{
+  "name": "logistics_drone",
+  "description": "Termeni de domeniu pentru livrări, drone și operațiuni TSP",
+  "categories": {
+    "drone": [
+      "drone", "drona", "dronă", "uav", "quadcopter", "multicopter",
+      "zbor", "zboara", "zboară", "aterizare", "baterie", "senzor", "gps",
+      "decolare", "autonomie", "elice", "payload", "altitudine", "telemetrie",
+      "gimbal", "sonar", "lidar", "acumulator"
+    ],
+    "livrare": [
+      "livrare", "livrari", "livrări", "colet", "colete", "pachet",
+      "curier", "destinatie", "destinație", "adresa", "adresă", "client",
+      "depozit", "hub", "traseu", "ruta", "rută",
+      "expeditor", "destinatar", "comanda", "comandă", "awb", "status",
+      "semnatura", "notificare", "receptie", "recepție", "retur"
+    ],
+    "optimizare": [
+      "optim", "optimizare", "cost", "distanta", "distanță", "timp",
+      "eficienta", "eficiență", "algoritm", "heuristic", "tsp",
+      "vizitare", "nod", "muchie", "graf",
+      "vrp", "matrice", "convergenta", "convergență", "solutie", "soluție",
+      "iteratie", "iterație", "complexitate", "permutare", "local-search"
+    ],
+    "operational": [
+      "intarziere", "întârziere", "defect", "mentenanta", "mentenanță",
+      "verificare", "monitorizare", "autonom", "autonoma", "autonomă",
+      "incarcare", "încărcare", "descarcare", "descărcare", "capacitate",
+      "meteo", "vant", "vânt", "restrictie", "restricție", "incident",
+      "dispecerat", "siguranta", "siguranță", "urgență", "urgenta", "senzor"
+    ]
+  }
+}

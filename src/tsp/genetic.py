@@ -1,22 +1,26 @@
 import random
 from typing import List, Tuple
 
+
 def init_population(pop_size, gene_count):
-    return [random.sample(range(gene_count), gene_count)
-            for _ in range(pop_size)]
+    return [
+        random.sample(range(gene_count), gene_count) for _ in range(pop_size)
+    ]
+
 
 def tournament_selection(pop, fitness_fn, k=3):
     candidates = random.sample(pop, k)
     return max(candidates, key=fitness_fn)
+
 
 def order_crossover(p1, p2):
     n = len(p1)
     a, b = sorted(random.sample(range(n), 2))
 
     child = [-1] * n
-    child[a:b+1] = p1[a:b+1]
+    child[a : b + 1] = p1[a : b + 1]
 
-    used = set(child[a:b+1])
+    used = set(child[a : b + 1])
     fill = [x for x in p2 if x not in used]
 
     idx = 0
@@ -27,6 +31,7 @@ def order_crossover(p1, p2):
 
     return child
 
+
 def swap_mutation(sol, mutation_rate):
     if random.random() < mutation_rate:
         i, j = random.sample(range(len(sol)), 2)
@@ -34,18 +39,29 @@ def swap_mutation(sol, mutation_rate):
     return sol
 
 
+def _tour_cost(tour: List[int], matrice: List[List[int]]) -> int:
+    n = len(tour)
+    if n == 0:
+        return 0
+    cost = sum(matrice[tour[i]][tour[i + 1]] for i in range(n - 1))
+    cost += matrice[tour[-1]][tour[0]]
+    return cost
+
+
 def genetic_algorithm(
     fitness_fn,
     gene_count,
+    matrice: List[List[int]] | None = None,
     pop_size=50,
     generations=200,
     mutation_rate=0.2,
-    selection_k=3
+    selection_k=3,
 ):
     pop = init_population(pop_size, gene_count)
 
     best = None
     best_fit = float("-inf")
+    history: list[float] = []
 
     for _ in range(generations):
         new_pop = []
@@ -67,48 +83,47 @@ def genetic_algorithm(
                 best_fit = f
                 best = ind
 
-    return best, best_fit
+        if matrice is not None and best is not None:
+            history.append(float(_tour_cost(best, matrice)))
+        elif best is not None and best_fit > 0:
+            history.append(1.0 / best_fit)
+
+    return best, best_fit, history
+
 
 def rezolva_tsp_ga(
-    matrice: List[List[int]], 
-    pop_size: int = 50, 
-    generations: int = 200, 
-    mutation_rate: float = 0.2, 
-    selection_k: int = 3
-) -> Tuple[List[int], int]:
-    """
-    Rezolva TSP utilizand algoritmul genetic, folosind matricea de distante.
-    """
+    matrice: List[List[int]],
+    pop_size: int = 50,
+    generations: int = 200,
+    mutation_rate: float = 0.2,
+    selection_k: int = 3,
+) -> Tuple[List[int], int, list[float], dict]:
     n = len(matrice)
-    
+
     if n == 0:
-        return [], 0
+        return [], 0, [], {}
 
     def fitness_fn(tour: List[int]) -> float:
-        cost = 0
-        for i in range(n - 1):
-            cost += matrice[tour[i]][tour[i + 1]]
-        cost += matrice[tour[-1]][tour[0]] 
-        
+        cost = _tour_cost(tour, matrice)
         if cost == 0:
-            return float('inf')
-            
+            return float("inf")
         return 1.0 / cost
 
-    # Rulam nucleul genetic
-    best_tour, best_fitness = genetic_algorithm(
+    best_tour, _best_fitness, history = genetic_algorithm(
         fitness_fn=fitness_fn,
         gene_count=n,
+        matrice=matrice,
         pop_size=pop_size,
         generations=generations,
         mutation_rate=mutation_rate,
-        selection_k=selection_k
+        selection_k=selection_k,
     )
 
-    best_cost = 0
-    if best_tour:
-        for i in range(n - 1):
-            best_cost += matrice[best_tour[i]][best_tour[i + 1]]
-        best_cost += matrice[best_tour[-1]][best_tour[0]]
-
-    return best_tour, best_cost # type: ignore
+    best_cost = _tour_cost(best_tour, matrice) if best_tour else 0
+    params = {
+        "pop_size": pop_size,
+        "generations": generations,
+        "mutation_rate": mutation_rate,
+        "selection_k": selection_k,
+    }
+    return best_tour, best_cost, history, params  # type: ignore[return-value]
